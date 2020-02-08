@@ -5,15 +5,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.UUID;
-import java.util.function.Consumer;
+
+@FunctionalInterface
+interface DataAction {
+    void apply(ResultSet resultSet) throws SQLException;
+}
 
 public class DataBaseClient implements AutoCloseable {
-    private static final String URL = "jdbc:mysql://localhost/SHOP_BASE?serverTimezone=europe/Moscow";
+    private static final String URL = "jdbc:mysql://localhost/SHOP_BASE?serverTimezone=Europe/Moscow";
     private static final String TABLE_NAME = "catalogue";
 
     private static DataBaseClient instance = null;
 
-    private Connection connection;
+    private final Connection connection;
 
     private DataBaseClient(String username, String password) throws SQLException {
         connection = DriverManager.getConnection(URL, username, password);
@@ -37,7 +41,7 @@ public class DataBaseClient implements AutoCloseable {
 
             for (int i = 1; i < numOfProducts + 1; i++) {
                 insertStatement.setString(1, UUID.randomUUID().toString());
-                insertStatement.setString(2, "товар " + i);
+                insertStatement.setString(2, "товар" + i);
                 insertStatement.setInt(3, i * 100);
                 insertStatement.addBatch();
             }
@@ -101,16 +105,31 @@ public class DataBaseClient implements AutoCloseable {
         }
     }
 
-    public void applyToAll(Consumer<ResultSet> function) throws SQLException {
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + TABLE_NAME)) {
-            while (resultSet.next()) {
-                function.accept(resultSet);
+    public int getPrice(String name) throws SQLException {
+        try (PreparedStatement statement =
+                     connection.prepareStatement("SELECT cost FROM " + TABLE_NAME + " WHERE title = ?")) {
+            statement.setString(1, name);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("cost");
+                }
+
+                throw new IllegalArgumentException();
             }
         }
     }
 
-    public void applyToPriceRange(int costFrom, int costTo, Consumer<ResultSet> function) throws SQLException {
+    public void applyToAll(DataAction action) throws SQLException {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + TABLE_NAME)) {
+            while (resultSet.next()) {
+                action.apply(resultSet);
+            }
+        }
+    }
+
+    public void applyToPriceRange(int costFrom, int costTo, DataAction action) throws SQLException {
         if (costTo < costFrom) {
             throw new IllegalArgumentException("From must be lower then to");
         }
@@ -119,10 +138,14 @@ public class DataBaseClient implements AutoCloseable {
         }
 
         try (PreparedStatement statement =
-                     connection.prepareStatement("SELECT * FROM " + TABLE_NAME + " WHERE cost >= ? AND cost <= ?");
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                function.accept(resultSet);
+                     connection.prepareStatement("SELECT * FROM " + TABLE_NAME + " WHERE cost >= ? AND cost <= ?")) {
+            statement.setInt(1, costFrom);
+            statement.setInt(2, costTo);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    action.apply(resultSet);
+                }
             }
         }
     }
@@ -163,12 +186,12 @@ public class DataBaseClient implements AutoCloseable {
 
     private void createTable() throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE WAREHOUSE(" +
+            statement.execute("CREATE TABLE " + TABLE_NAME + "(" +
                     "id INT NOT NULL AUTO_INCREMENT," +
                     "prodid VARCHAR(36) NOT NULL," +
                     "title VARCHAR(50) NOT NULL," +
                     "cost INT NOT NULL," +
-                    "PRIMARY KEY(id)");
+                    "PRIMARY KEY(id))");
             connection.commit();
         }
     }
