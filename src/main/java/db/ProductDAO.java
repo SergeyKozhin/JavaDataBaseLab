@@ -173,6 +173,10 @@ public class ProductDAO {
     }
 
     public void updatePrice(String name, int cost) {
+        if (cost < 0) {
+            throw new IllegalArgumentException("Price can't be negative");
+        }
+
         try (Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement("UPDATE " + TABLE_NAME + " SET cost = ? WHERE title = ?")) {
             statement.setInt(1, cost);
@@ -185,7 +189,7 @@ public class ProductDAO {
         }
     }
 
-    public void remove(String name) {
+    public void delete(String name) {
         try (Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement("DELETE FROM " + TABLE_NAME + " WHERE title = ?")) {
             statement.setString(1, name);
