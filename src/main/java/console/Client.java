@@ -24,7 +24,7 @@ public class Client {
             "/add", Client::add,
             "/delete", Client::delete,
             "/show_all", Client::showAll,
-            "/price", Client::showAll,
+            "/price", Client::showPrice,
             "/change_price", Client::updatePrice,
             "/filter_by_price", Client::showFiltered
     );
@@ -42,6 +42,7 @@ public class Client {
             out.println(e.getMessage());
         }
 
+        out.println("Client is up. You can enter commands.");
         while (in.hasNextLine()) {
             execute(in.nextLine());
         }
@@ -61,8 +62,6 @@ public class Client {
                 out.println("Redundant arguments: " + line.nextLine().strip());
             }
         }
-
-        out.println();
     }
 
     private void add(Scanner line) {
@@ -111,7 +110,7 @@ public class Client {
         in.nextLine();
 
         dao = new ProductDAO(username, password);
-        System.out.println("\nLogin successful");
+        System.out.println("Login successful");
     }
 
     private void reset() {
@@ -123,6 +122,8 @@ public class Client {
         }
         dao.clear();
         dao.add(list);
+
+        out.println("Table successfully filled.");
     }
 
     private int extractCost(Scanner line) {
