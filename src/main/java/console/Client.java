@@ -103,7 +103,7 @@ public class Client {
     }
 
     private void showFiltered(Scanner line) {
-        int costFrom  = extractCost(line);
+        int costFrom = extractCost(line);
         int costTo = extractCost(line);
 
         dao.listFromPriceRange(costFrom, costTo).forEach(out::println);

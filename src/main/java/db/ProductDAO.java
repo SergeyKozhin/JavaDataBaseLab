@@ -22,7 +22,7 @@ public class ProductDAO {
         dataSource.setUser(username);
         dataSource.setPassword(password);
 
-        try (Connection connection = dataSource.getConnection()){
+        try (Connection connection = dataSource.getConnection()) {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error while connecting to database", e);
@@ -80,7 +80,7 @@ public class ProductDAO {
 
     public Product getById(int id) {
         try (Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + TABLE_NAME + " WHERE id = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + TABLE_NAME + " WHERE id = ?")) {
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -133,7 +133,7 @@ public class ProductDAO {
         ArrayList<Product> list = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection();
-            Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
             try (ResultSet resultSet = statement.executeQuery("SELECT * FROM catalogue")) {
                 while (resultSet.next()) {
                     list.add(toProduct(resultSet));
@@ -178,7 +178,7 @@ public class ProductDAO {
         }
 
         try (Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement("UPDATE " + TABLE_NAME + " SET cost = ? WHERE title = ?")) {
+             PreparedStatement statement = connection.prepareStatement("UPDATE " + TABLE_NAME + " SET cost = ? WHERE title = ?")) {
             statement.setInt(1, cost);
             statement.setString(2, name);
             if (statement.executeUpdate() == 0) {
@@ -191,7 +191,7 @@ public class ProductDAO {
 
     public void delete(String name) {
         try (Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM " + TABLE_NAME + " WHERE title = ?")) {
+             PreparedStatement statement = connection.prepareStatement("DELETE FROM " + TABLE_NAME + " WHERE title = ?")) {
             statement.setString(1, name);
             if (statement.executeUpdate() == 0) {
                 throw new IllegalArgumentException("No such product");
@@ -203,7 +203,7 @@ public class ProductDAO {
 
     public void clear() {
         try (Connection connection = dataSource.getConnection();
-            Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
             statement.execute("TRUNCATE TABLE " + TABLE_NAME);
         } catch (SQLException e) {
             throw new RuntimeException("Error while clearing table", e);
@@ -225,7 +225,7 @@ public class ProductDAO {
 
     private boolean tableExists() {
         try (Connection connection = dataSource.getConnection();
-            ResultSet resultSet =
+             ResultSet resultSet =
                      connection.getMetaData().getTables(null, null, TABLE_NAME, null)) {
             while (resultSet.next()) {
                 if (resultSet.getString("TABLE_NAME").equals(TABLE_NAME)) {
