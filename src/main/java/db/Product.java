@@ -13,6 +13,10 @@ public class Product {
     }
 
     public Product(int id, String prodId, String title, int cost) {
+        if (cost < 0) {
+            throw new IllegalArgumentException("Price can't be negative");
+        }
+
         this.id = id;
         this.prodId = prodId;
         this.title = title;
@@ -56,6 +60,10 @@ public class Product {
     }
 
     public void setCost(int cost) {
+        if (cost < 0) {
+            throw new IllegalArgumentException("Price can't be negative");
+        }
+
         this.cost = cost;
     }
 
