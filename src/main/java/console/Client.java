@@ -44,7 +44,13 @@ public class Client {
 
         out.println("Client is up. You can enter commands.");
         while (in.hasNextLine()) {
-            execute(in.nextLine());
+            String command = in.nextLine();
+            if (command.equals("/exit")) {
+                out.println("Exiting.");
+                break;
+            }
+
+            execute(command);
         }
     }
 
