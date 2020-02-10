@@ -15,15 +15,19 @@ import java.util.Collection;
 public class ProductDAO {
     private static final String TABLE_NAME = "catalogue";
 
-    private static MysqlDataSource dataSource = new MysqlDataSource();
+    private MysqlDataSource dataSource = new MysqlDataSource();
 
-    static {
+    public ProductDAO(String username, String password) {
         dataSource.setUrl("jdbc:mysql://localhost/SHOP_BASE?serverTimezone=Europe/Moscow");
-        dataSource.setUser("test");
-        dataSource.setPassword("password");
-    }
+        dataSource.setUser(username);
+        dataSource.setPassword(password);
 
-    public ProductDAO() {
+        try (Connection connection = dataSource.getConnection()){
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error while connecting to database", e);
+        }
+
         if (!tableExists()) {
             createTable();
         }
