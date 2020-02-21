@@ -65,7 +65,7 @@ public class Client {
             }
 
             if (line.hasNextLine()) {
-                out.println("Redundant arguments: " + line.nextLine().strip());
+                out.println("Redundant arguments: " + line.nextLine().trim());
             }
         }
     }
@@ -124,7 +124,7 @@ public class Client {
         int n = in.nextInt();
         List<Product> list = new ArrayList<>();
         for (int i = 1; i < n + 1; i++) {
-            list.add(new Product("товар" + i, i * 100));
+            list.add(new Product("product" + i, i * 100));
         }
         dao.clear();
         dao.add(list);
