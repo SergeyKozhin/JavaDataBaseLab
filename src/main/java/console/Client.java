@@ -36,7 +36,11 @@ public class Client {
 
     public void start() {
         try {
-            login();
+            while (true) {
+                if (login()) break;
+            }
+            out.println("Login successful");
+
             reset();
         } catch (IllegalArgumentException e) {
             out.println(e.getMessage());
@@ -109,14 +113,21 @@ public class Client {
         dao.listFromPriceRange(costFrom, costTo).forEach(out::println);
     }
 
-    private void login() {
+    private boolean login() {
         out.println("Enter login and password:");
         String username = in.next();
         String password = in.next();
         in.nextLine();
 
-        dao = new ProductDAO(username, password);
-        System.out.println("Login successful");
+        try {
+            dao = new ProductDAO(username, password);
+        } catch (RuntimeException e) {
+            out.println(e.getMessage());
+            out.println(e.getCause().getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     private void reset() {
