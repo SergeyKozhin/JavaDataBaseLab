@@ -19,6 +19,8 @@ import javafx.stage.Stage;
 import ui.MainApp;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataBaseWindowController {
     private MainApp mainApp;
@@ -47,10 +49,20 @@ public class DataBaseWindowController {
     private Button deleteButton;
 
     @FXML
+    private Button filterButton;
+
+    @FXML
+    private Button generateButton;
+
+    @FXML
     private TextField priceFromField;
 
     @FXML
     private TextField priceToField;
+
+    @FXML
+    private TextField amountField;
+
 
     @FXML
     private void initialize() {
@@ -61,6 +73,8 @@ public class DataBaseWindowController {
 
         updateButton.setDisable(true);
         deleteButton.setDisable(true);
+        filterButton.setDisable(true);
+        generateButton.setDisable(true);
 
         tableView.setItems(products);
         tableView.getSelectionModel().selectedItemProperty().addListener(((observableValue, book, newValue) -> {
@@ -72,6 +86,30 @@ public class DataBaseWindowController {
                 deleteButton.setDisable(true);
             }
         }));
+
+        priceFromField.textProperty().addListener(((observableValue, priceFrom, newPriceFrom) -> {
+            if (newPriceFrom.isEmpty() && priceToField.getText().isEmpty()) {
+                filterButton.setDisable(true);
+            } else {
+                filterButton.setDisable(false);
+            }
+        }));
+
+        priceToField.textProperty().addListener(((observableValue, priceTo, newPriceTo) -> {
+            if (newPriceTo.isEmpty() && priceFromField.getText().isEmpty()) {
+                filterButton.setDisable(true);
+            } else {
+                filterButton.setDisable(false);
+            }
+        }));
+
+        amountField.textProperty().addListener((observableValue, amount, newAmount) -> {
+            if (newAmount.isEmpty()) {
+                generateButton.setDisable(true);
+            } else {
+                generateButton.setDisable(false);
+            }
+        });
     }
 
     @FXML
@@ -124,7 +162,7 @@ public class DataBaseWindowController {
         } else try {
             priceFrom = Integer.parseInt(priceFromField.getText());
         } catch (NumberFormatException e) {
-            showError("Wrong from price format");
+            showError("Wrong from price format. Must be integer!");
             return;
         }
         if (priceFrom < 0) {
@@ -138,7 +176,7 @@ public class DataBaseWindowController {
         } else try {
             priceTo = Integer.parseInt(priceToField.getText());
         } catch (NumberFormatException e) {
-            showError("Wrong to price format");
+            showError("Wrong to price format. Must be integer!");
             return;
         }
         if (priceTo < priceFrom) {
@@ -156,6 +194,31 @@ public class DataBaseWindowController {
     @FXML
     private void handleReset() {
         products.setAll(dao.list());
+    }
+
+    @FXML
+    private void handleGenerate() {
+        try {
+            int amount  = Integer.parseInt(amountField.getText());
+            if (amount < 0) {
+                showError("Amount can't be negative");
+                return;
+            }
+
+            try {
+                List<Product> list = new ArrayList<>();
+                for (int i = 1; i < amount + 1; i++) {
+                    list.add(new Product("product" + i, i * 100));
+                }
+                dao.clear();
+                dao.add(list);
+                products.setAll(dao.list());
+            } catch (IllegalArgumentException e) {
+                showError(e.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            showError("Wrong amount format. Must be integer!");
+        }
     }
 
     @FXML

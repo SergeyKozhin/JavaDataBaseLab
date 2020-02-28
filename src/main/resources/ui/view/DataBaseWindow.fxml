@@ -64,8 +64,8 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
          <children>
-            <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Generate" GridPane.columnIndex="1" />
-            <TextField promptText="Ammount" />
+            <Button fx:id="generateButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleGenerate" text="Generate" GridPane.columnIndex="1" />
+            <TextField fx:id="amountField" promptText="Amount" />
          </children>
       </GridPane>
     </children>
