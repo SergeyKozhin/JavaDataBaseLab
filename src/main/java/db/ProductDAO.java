@@ -165,6 +165,9 @@ public class ProductDAO {
                     list.add(toProduct(resultSet));
                 }
             }
+            if (list.isEmpty()) {
+                throw new IllegalArgumentException("No products in price range.");
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error while retrieving list of products", e);
         }
