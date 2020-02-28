@@ -9,7 +9,7 @@ public class Product {
     private int cost;
 
     public Product() {
-
+        this("", 0);
     }
 
     public Product(int id, String prodId, String title, int cost) {

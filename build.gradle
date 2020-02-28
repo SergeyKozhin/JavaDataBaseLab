@@ -1,4 +1,5 @@
 plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'java'
 }
 
@@ -6,6 +7,10 @@ group 'org.example'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
 
 repositories {
     mavenCentral()
