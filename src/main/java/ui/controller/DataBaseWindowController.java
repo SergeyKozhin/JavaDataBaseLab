@@ -13,13 +13,14 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.MainApp;
 
 import java.io.IOException;
 
-public class MainWindowController {
+public class DataBaseWindowController {
     private MainApp mainApp;
     private ProductDAO dao;
     private ObservableList<Product> products = FXCollections.observableArrayList();
@@ -46,10 +47,13 @@ public class MainWindowController {
     private Button deleteButton;
 
     @FXML
-    private void initialize() {
-        dao = new ProductDAO("test", "password");
-        products.setAll(dao.list());
+    private TextField priceFromField;
 
+    @FXML
+    private TextField priceToField;
+
+    @FXML
+    private void initialize() {
         idColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
         prodIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getProdId()));
         titleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTitle()));
@@ -112,6 +116,48 @@ public class MainWindowController {
         products.setAll(dao.list());
     }
 
+    @FXML
+    private void handleFilterByPrice() {
+        int priceFrom;
+        if (priceFromField.getText() == null || priceFromField.getText().isEmpty()) {
+            priceFrom = 0;
+        } else try {
+            priceFrom = Integer.parseInt(priceFromField.getText());
+        } catch (NumberFormatException e) {
+            showError("Wrong from price format");
+            return;
+        }
+        if (priceFrom < 0) {
+            showError("Price can't be negative");
+            return;
+        }
+
+        int priceTo;
+        if (priceToField.getText() == null || priceToField.getText().isEmpty()) {
+            priceTo = Integer.MAX_VALUE;
+        } else try {
+            priceTo = Integer.parseInt(priceToField.getText());
+        } catch (NumberFormatException e) {
+            showError("Wrong to price format");
+            return;
+        }
+        if (priceTo < priceFrom) {
+            showError("From must be lower then to");
+            return;
+        }
+
+        try {
+            products.setAll(dao.listFromPriceRange(priceFrom, priceTo));
+        } catch (IllegalArgumentException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleReset() {
+        products.setAll(dao.list());
+    }
+
     private boolean showUpdatePriceDialog(Product product) {
         try {
             FXMLLoader loader = new FXMLLoader(mainApp.getClass().getResource("/ui/view/UpdatePriceWindow.fxml"));
@@ -170,5 +216,10 @@ public class MainWindowController {
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
+    }
+
+    public void setDao(ProductDAO dao) {
+        this.dao = dao;
+        products.setAll(dao.list());
     }
 }

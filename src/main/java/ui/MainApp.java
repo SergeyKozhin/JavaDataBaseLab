@@ -1,10 +1,11 @@
 package ui;
 
+import db.ProductDAO;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import ui.controller.MainWindowController;
+import ui.controller.DataBaseWindowController;
 
 import java.io.IOException;
 
@@ -18,15 +19,20 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         this.primaryStage = stage;
+        openDataBaseWindow(new ProductDAO("test", "password"));
+    }
+
+    private void openDataBaseWindow(ProductDAO dao) {
         try {
-            FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/ui/view/MainWindow.fxml"));
-            stage.setScene(new Scene(loader.load()));
-            stage.setTitle("Data Base Client");
+            FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/ui/view/DataBaseWindow.fxml"));
+            primaryStage.setScene(new Scene(loader.load()));
+            primaryStage.setTitle("Data Base Client");
 
-            MainWindowController controller = loader.getController();
+            DataBaseWindowController controller = loader.getController();
             controller.setMainApp(this);
+            controller.setDao(dao);
 
-            stage.show();
+            primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
