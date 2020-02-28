@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import ui.controller.DataBaseWindowController;
+import ui.controller.LoginWindowController;
 
 import java.io.IOException;
 
@@ -19,10 +20,24 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         this.primaryStage = stage;
-        openDataBaseWindow(new ProductDAO("test", "password"));
+        openLoginWindow();
+        stage.show();
     }
 
-    private void openDataBaseWindow(ProductDAO dao) {
+    public void openLoginWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/ui/view/LoginWindow.fxml"));
+            primaryStage.setScene(new Scene(loader.load()));
+            primaryStage.setTitle("DataBase login");
+
+            LoginWindowController controller = loader.getController();
+            controller.setMainApp(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void openDataBaseWindow(ProductDAO dao) {
         try {
             FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/ui/view/DataBaseWindow.fxml"));
             primaryStage.setScene(new Scene(loader.load()));
@@ -31,8 +46,6 @@ public class MainApp extends Application {
             DataBaseWindowController controller = loader.getController();
             controller.setMainApp(this);
             controller.setDao(dao);
-
-            primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

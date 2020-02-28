@@ -158,6 +158,11 @@ public class DataBaseWindowController {
         products.setAll(dao.list());
     }
 
+    @FXML
+    private void handleExit() {
+        mainApp.openLoginWindow();
+    }
+
     private boolean showUpdatePriceDialog(Product product) {
         try {
             FXMLLoader loader = new FXMLLoader(mainApp.getClass().getResource("/ui/view/UpdatePriceWindow.fxml"));
